@@ -1178,27 +1178,10 @@ const char* fix_dt_needed(const char* dt_needed, const char* sopath __unused) {
   return dt_needed;
 }
 
-static bool get_executable_path(std::string &executable_path) {
-  char path[PATH_MAX];
-  ssize_t path_len = readlink("/proc/self/exe", path, sizeof(path) - 1);
-  if (path_len <= 1 || path_len >= PATH_MAX) {
-    return false;
-  }
-  path[path_len] = '\0';
-  if (!file_exists(path)) {
-    return false;
-  }
-  executable_path = std::string(path, path_len);
-  return true;
-}
-
 template<typename F>
 static void for_each_dt_needed(const ElfReader& elf_reader, F action) {
 #ifdef LD_SHIM_LIBS
-  std::string executable_path;
-  if (get_executable_path(executable_path)) {
-    for_each_matching_shim(executable_path.c_str(), action);
-  }
+  for_each_matching_shim(get_executable_path(), action);
   for_each_matching_shim(elf_reader.name(), action);
 #endif
   for (const ElfW(Dyn)* d = elf_reader.dynamic(); d->d_tag != DT_NULL; ++d) {
