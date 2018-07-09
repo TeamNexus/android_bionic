@@ -183,7 +183,7 @@ static void init_linker_info_for_gdb(ElfW(Addr) linker_base, char* linker_path) 
 
 extern "C" int __system_properties_init(void);
 
-const char* get_executable_path() {
+static const char* get_executable_path() {
   static std::string executable_path;
   if (executable_path.empty()) {
     char path[PATH_MAX];
@@ -366,6 +366,12 @@ static ElfW(Addr) __linker_init_post_relocation(KernelArgumentBlock& args) {
     needed_library_name_list.push_back(ld_preload_name.c_str());
     ++ld_preloads_count;
   }
+
+#ifdef LD_SHIM_LIBS
+  for_each_matching_shim(si->get_realpath(), [&](const char* name) {
+    needed_library_name_list.push_back(name);
+  });
+#endif
 
   for_each_dt_needed(si, [&](const char* name) {
     needed_library_name_list.push_back(name);
