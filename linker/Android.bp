@@ -166,10 +166,8 @@ cc_binary {
         debuggable: {
             cppflags: ["-DUSE_LD_CONFIG_FILE"],
         },
-        lineage: {
-            target_shim_libs: {
-                cppflags: ["-DLD_SHIM_LIBS=\"%s\""],
-            },
+        target_shim_libs: {
+            cppflags: ["-DLD_SHIM_LIBS=\"%s\""],
         },
     },
 
